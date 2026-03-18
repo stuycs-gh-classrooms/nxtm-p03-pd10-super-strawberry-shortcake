@@ -73,8 +73,7 @@ YOUR ANSWER HERE
 ### Simulation 4: Custom force
 Describe what your Custom force simulation will look like. Explain how it will be setup, and how it should behave while running.
 
-YOUR ANSWER HERE
-
+Our custom force simulation will give each orb a random charge. Orbs with positive charges will repel other orbs with positive charges, and attract negative and neutral charges, and vice versa.
 --- 
 
 ### Simulation 5: Combination
