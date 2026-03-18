@@ -2,7 +2,7 @@
 ## Project 00
 ### NeXTCS
 ### Period: 
-## Thinker0: YOUR NAME HERE
+## Thinker0: Andrew Zhao
 ## Thinker1: OTHER NAME HERE
 ## Thinker2: OTHER NAME HERE (delete this line if you are a duo)
 ---
