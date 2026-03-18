@@ -34,7 +34,14 @@ What is the formula for your force? Including descriptions/definitions for the s
 Fe = (kq1q2 / r2) * rHAT
 
 ### Custom Force Breakdown
-- What information that is already present in the `Orb` or `OrbNode` classes does this force use?
+- What information that is already present in the `Orb` orA distinct demonstration for each individual force (including gravity and the spring force).
+A visual menu at the top providing information about which simulation is currently active and indicating whether movement is on or off.
+The ability to toggle movement on/off
+The ability to toggle bouncing on/off
+The user should be able to switch between simluations using the number keys as follows:
+
+    1: Gravity
+    2: Spring Force `OrbNode` classes does this force use?
   - distance between two orbs.
 
 - Does this force require any new constants, if so what are they and what values will you try initially?
@@ -54,30 +61,37 @@ Fe = (kq1q2 / r2) * rHAT
 ### Simulation 1: Gravity
 Describe how you will attempt to simulate orbital motion.
 
---- 
+--- Each orb will apply a gravitational force to the other orbs, however there will be one fixed orb at the center of the screen with the most mass, and other orbs will orbit around this one orb as its gravitational A distinct demonstration for each individual force (including gravity and the spring force).
+A visual menu at the top providing information about which simulation is currently active and indicating whether movement is on or off.
+The ability to toggle movement on/off
+The ability to toggle bouncing on/off
+The user should be able to switch between simluations using the number keys as follows:
+
+    1: Gravity
+    2: Spring Forceforce will overwhelm the other forces.
 
 ### Simulation 2: Spring
 Describe what your spring simulation will look like. Explain how it will be setup, and how it should behave while running.
 
-YOUR ANSWER HERE
+Orbs will be connected to the orb behind it in an array of orbs with a "spring" represented by a line. This spring will make each orb act as if it is attached to a spring to another orb. Orbs will be attracted to other orbs unless the spring between them is compressed, then they will repel.
 
 --- 
 
 ### Simulation 3: Drag
 Describe what your drag simulation will look like. Explain how it will be setup, and how it should behave while running.
 
-YOUR ANSWER HERE
+A drag force will be applied to each orb depending on its mass. This force will not be evident unless the orb is moving, however this force will constantly decelerate an orb if it is moving. A force can be applied on an orb by pressing a button.
 
 --- 
 
 ### Simulation 4: Custom force
 Describe what your Custom force simulation will look like. Explain how it will be setup, and how it should behave while running.
 
-Our custom force simulation will give each orb a random charge. Orbs with positive charges will repel other orbs with positive charges, and attract negative and neutral charges, and vice versa.
+Our electrostatic force simulation will give each orb a random charge, or give each orb a neutral charge based on a setting. Orbs with positive charges will repel other orbs with positive charges, and attract negative and neutral charges, and vice versa.
 --- 
 
 ### Simulation 5: Combination
 Describe what your combination simulation will look like. Explain how it will be setup, and how it should behave while running.
 
-YOUR ANSWER HERE
+The combination simulation will look like a combination of all the other simulations, there will be a fixed orb at the center, each orb will be be connected to the orb behind it in an orb array with a spring, drag force will be applied to every orb. Each orb should behave as if all forces available are being applied to it.
 
