@@ -62,13 +62,7 @@ The user should be able to switch between simluations using the number keys as f
 Describe how you will attempt to simulate orbital motion.
 
 --- Each orb will apply a gravitational force to the other orbs, however there will be one fixed orb at the center of the screen with the most mass, and other orbs will orbit around this one orb as its gravitational A distinct demonstration for each individual force (including gravity and the spring force).
-A visual menu at the top providing information about which simulation is currently active and indicating whether movement is on or off.
-The ability to toggle movement on/off
-The ability to toggle bouncing on/off
-The user should be able to switch between simluations using the number keys as follows:
 
-    1: Gravity
-    2: Spring Forceforce will overwhelm the other forces.
 
 ### Simulation 2: Spring
 Describe what your spring simulation will look like. Explain how it will be setup, and how it should behave while running.
