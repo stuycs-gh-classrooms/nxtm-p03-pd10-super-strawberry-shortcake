@@ -87,5 +87,5 @@ Our electrostatic force simulation will give each orb a random charge, or give e
 ### Simulation 5: Combination
 Describe what your combination simulation will look like. Explain how it will be setup, and how it should behave while running.
 
-The combination simulation will look like a combination of all the other simulations, there will be a fixed orb at the center, each orb will be be connected to the orb behind it in an orb array with a spring, drag force will be applied to every orb. Each orb should behave as if all forces available are being applied to it.
+The combination simulation will look like a combination of all the other simulations, there will be a fixed orb at the center(which will inflict gravitational force), each orb will be be connected to the orb behind it and/or in front of it in an orb array with springs(each orb wil inflict spring force on the other), drag force will be applied to every orb (slowing down orbs based on velocity and direction), and all orbs have individually adjustable charges(allowing electrostatic force to be present, creating both repulsion and attraction between orbs).
 
