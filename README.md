@@ -82,6 +82,7 @@ A drag force will be applied to each orb depending on its mass. This force will 
 Describe what your Custom force simulation will look like. Explain how it will be setup, and how it should behave while running.
 
 Our electrostatic force simulation will give each orb a random charge, or give each orb a neutral charge based on a setting. Orbs with positive charges will repel other orbs with positive charges, and attract negative and neutral charges, and vice versa.
+
 --- 
 
 ### Simulation 5: Combination
