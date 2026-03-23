@@ -125,6 +125,17 @@ class Orb
     return direction;
   }//getSpring
   
+  /**
+   getEF()
+   
+   Calculates the force felt by another objects electrostatic field onto this object.
+   
+   The resulting force should push the calling object away if the charges are both positive or both negative, 
+   and the resulting force should pull the calling object if the charges are positive and negative, or neutral and positive, or vice versa.
+   
+   eK: electrostatic constant
+   */
+  
   PVector getEF (Orb other, float eK) {
     PVector direction = PVector.sub(other.center, this.center);
     direction.normalize();

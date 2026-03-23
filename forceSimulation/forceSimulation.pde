@@ -43,8 +43,10 @@ int MOVING = 0;
 int BOUNCE = 1;
 int GRAVITY = 2;
 int DRAGF = 3;
-boolean[] toggles = new boolean[4];
-String[] modes = {"Moving", "Bounce", "Gravity", "Drag"};
+int ELECTROSTATIC = 4;
+int COMBINATION = 5;
+boolean[] toggles = new boolean[6];
+String[] modes = {"Moving", "Bounce", "Gravity", "Drag","Electrostatic","Combination"};
 
 FixedOrb earth;
 Orb[] orbs;
@@ -91,12 +93,35 @@ void draw()
             PVector gForce = orbs[o].getGravity(orbs[other], G_CONSTANT);
             orbs[o].applyForce(gForce);
           }
+
         }
       }
       if (toggles[DRAGF]) {
         orbs[o].applyForce(orbs[o].getDragForce(D_COEF));
       }
-    }//gravity, drag
+      
+      if (toggles[ELECTROSTATIC]) {
+        for (int other = 0; other < orbCount; other++) {
+          if (o != other) {
+           
+        PVector eForce = orbs[o].getGravity(orbs[other], E_CONSTANT);
+        orbs[o].applyForce(eForce);
+      }
+        }
+      }
+      
+      if (toggles[COMBINATION]) {
+        for (int o = 0; o < orbCount; o++) {
+        for (int other = 0; other < orbCount; other++) {
+          if (o != other) {
+            PVector gForce = orbs[o].getGravity(orbs[other], G_CONSTANT);
+                    orbs[o].applyForce(orbs[o].getDragForce(D_COEF));
+   
+          }
+        }
+        }
+      }
+    }//gravity, drag, electrostatic
 
     for (int o=0; o < orbCount; o++) {
       orbs[o].move(toggles[BOUNCE]);
@@ -199,17 +224,18 @@ void applySprings()
   }
 }//applySprings
 
+
 void applyElectro() {
-  for (int i = 1; i < orbCount; i++) {
-    
+
 } //applyElectro
 
 void applyCharge() {
   for (int i = 1; i < orbCount; i++) {
     
+    
+  }
+    
 }
-
-void 
 
 
 /**
@@ -266,15 +292,36 @@ void keyPressed()
 {
   if (key == ' ') {
     toggles[MOVING]  = !toggles[MOVING];
+    
   }
   if (key == 'g') {
     toggles[GRAVITY] = !toggles[GRAVITY];
+    toggles[DRAGF] = false;
+    toggles[ELECTROSTATIC] = false;
+    toggles[COMBINATION] = false;
   }
   if (key == 'b') {
     toggles[BOUNCE]  = !toggles[BOUNCE];
+    
   }
   if (key == 'd') {
     toggles[DRAGF]   = !toggles[DRAGF];
+    toggles[GRAVITY] = false;
+    toggles[ELECTROSTATIC] = false;
+    toggles[COMBINATION] = false;
+    
+  }
+  if (key == 'e') {
+    toggles[ELECTROSTATIC]   = !toggles[ELECTROSTATIC];
+    toggles[GRAVITY] = false;
+    toggles[DRAGF] = false;
+    toggles[COMBINATION] = false;
+  }
+  if (key == 'c') {
+    toggles[COMBINATION]   = !toggles[COMBINATION];
+    toggles[GRAVITY] = false;
+    toggles[DRAGF] = false;
+    toggles[ELECTROSTATIC] = false;
   }
   if (key == '1') {
     makeOrbs(true);
