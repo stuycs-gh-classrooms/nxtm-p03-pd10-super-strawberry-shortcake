@@ -8,6 +8,7 @@ class Orb
   float bsize;
   float mass;
   color c;
+  float charge;
 
 
   /**
@@ -123,7 +124,18 @@ class Orb
     direction.mult(mag);
     return direction;
   }//getSpring
-
+  
+  PVector getEF (Orb other, float eK) {
+    PVector direction = PVector.sub(other.center, this.center);
+    direction.normalize();
+    
+    float displacement = this.center.dist(other.center);
+    float mag = (eK * (other.charge * this.charge)) / sq(displacement);
+    direction.mult(mag);
+    direction.mult(-1);
+    
+    return direction;
+  }
 
   /**
    Makes the orb bounce off of the top and bottom sides of the box.
