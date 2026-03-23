@@ -34,6 +34,7 @@ float MIN_MASS = 10;
 float MAX_MASS = 100;
 float G_CONSTANT = 0.1;
 float D_COEF = 0.1;
+float E_CONSTANT = 0.1;
 
 int SPRING_LENGTH = 50;
 float SPRING_K = 0.005;
@@ -197,6 +198,18 @@ void applySprings()
     orbs[i].applyForce(f);
   }
 }//applySprings
+
+void applyElectro() {
+  for (int i = 1; i < orbCount; i++) {
+    
+} //applyElectro
+
+void applyCharge() {
+  for (int i = 1; i < orbCount; i++) {
+    
+}
+
+void 
 
 
 /**
