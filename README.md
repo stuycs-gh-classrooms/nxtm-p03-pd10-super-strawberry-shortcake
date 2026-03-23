@@ -34,9 +34,13 @@ What is the formula for your force? Including descriptions/definitions for the s
 Fe = (kq1q2 / r2) * rHAT
 
 Fe = electrostatic force
+
 k = electrostatic constant
+
 q1 = charge of object 1
+
 q2 = charge of object 2
+
 rHAT = directional vector
 
 ### Custom Force Breakdown
