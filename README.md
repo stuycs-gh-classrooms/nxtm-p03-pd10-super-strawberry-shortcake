@@ -33,6 +33,12 @@ What is the formula for your force? Including descriptions/definitions for the s
 
 Fe = (kq1q2 / r2) * rHAT
 
+Fe = electrostatic force
+k = electrostatic constant
+q1 = charge of object 1
+q2 = charge of object 2
+rHAT = directional vector
+
 ### Custom Force Breakdown
 - What information that is already present in the `Orb` orA distinct demonstration for each individual force (including gravity and the spring force).
 A visual menu at the top providing information about which simulation is currently active and indicating whether movement is on or off.
