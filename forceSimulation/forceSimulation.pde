@@ -34,7 +34,7 @@ float MIN_MASS = 10;
 float MAX_MASS = 100;
 float G_CONSTANT = 0.1;
 float D_COEF = 0.1;
-float E_CONSTANT = 500;
+float E_CONSTANT = 5000;
 
 int SPRING_LENGTH = 50;
 float SPRING_K = 0.005;
@@ -54,6 +54,7 @@ FixedOrb earth;
 Orb[] orbs;
 int orbCount;
 
+int s = GRAVITY; //used to switch between constants in combination
 
 void setup()
 {
@@ -166,6 +167,7 @@ void makeOrbs(boolean ordered)
   }
   for (int i = 1; i < orbCount; i++) {
     orbs[i] = new Orb();
+    
     if (ordered) {
       orbs[i].center.x = (SPRING_LENGTH / 2) + (i * SPRING_LENGTH);
       orbs[i].center.y = height / 2;
@@ -260,12 +262,12 @@ void addOrb()
 {
   int index = findAvailableIndex();
   if (index == -1) {
-    Orb[] tempArray = new Orb[orbCount + 1];
-    arrayCopy(orbs, tempArray);
-    tempArray[orbCount] = new Orb();
-    tempArray[orbCount].center.x = orbs[orbCount - 1].center.x + SPRING_LENGTH;
-    tempArray[orbCount].center.y = orbs[orbCount - 1].center.y;
     orbCount++;
+    Orb[] tempArray = new Orb[orbCount];
+    arrayCopy(orbs, tempArray);
+    tempArray[orbCount-1] = new Orb();
+    tempArray[orbCount-1].center.x = orbs[orbCount - 2].center.x + SPRING_LENGTH;
+    tempArray[orbCount-1].center.y = orbs[orbCount - 2].center.y;
     orbs = tempArray;
   }
   else {
@@ -355,10 +357,10 @@ void keyPressed()
     makeOrbs(false);
     applyCharge();
   }
-  if (key == '1') {
+  if (key == 'o') {
     makeOrbs(true);
   }
-  if (key == '2') {
+  if (key == 'u') {
     makeOrbs(false);
   }
 
@@ -371,6 +373,102 @@ void keyPressed()
   if (key == '=' || key == '+') {
     addOrb();
   }//addition
+  //separate simulations
+  if (keyCode == UP) {
+    if (toggles[GRAVITY]) {
+      G_CONSTANT *= 10;
+      G_CONSTANT += 1;
+      G_CONSTANT /= 10;
+    }
+    else if (toggles[DRAGF]) {
+      D_COEF *= 10;
+      D_COEF += 1;
+      D_COEF /= 10;
+    }
+    else if (toggles[SPRING]) {
+      SPRING_K *= 1000;
+      SPRING_K += 5;
+      SPRING_K /= 1000;
+    }
+  }
+  if (keyCode == DOWN) {
+    if (toggles[GRAVITY]) {
+      G_CONSTANT *= 10;
+      G_CONSTANT -= 1;
+      G_CONSTANT /= 10;
+    }
+    else if (toggles[DRAGF]) {
+      D_COEF *= 10;
+      D_COEF -= 1;
+      D_COEF /= 10;
+    }
+    else if (toggles[SPRING]) {
+      SPRING_K *= 1000;
+      SPRING_K -= 5;
+      SPRING_K /= 1000;
+    }
+  }
+  
+  if (toggles[COMBINATION]) {
+    
+    if (keyCode == LEFT) {
+      if (s == GRAVITY) {
+        s = SPRING;
+      }
+      else {
+        s--;
+      }
+    }
+    
+    if (keyCode == RIGHT) {
+      if (s == SPRING) {
+        s = GRAVITY;
+      }
+      else {
+        s++;
+      }
+    }
+    
+    if (keyCode == UP) {
+      if (s == GRAVITY) {
+        G_CONSTANT *= 10;
+        G_CONSTANT += 1;
+        G_CONSTANT /= 10;
+      }
+      else if (s == DRAGF) {
+        D_COEF *= 10;
+        D_COEF += 1;
+        D_COEF /= 10;
+      }
+      else if (s == SPRING) {
+        SPRING_K *= 1000;
+        SPRING_K += 5;
+        SPRING_K /= 1000;
+        //SPRING_K += 0.005;
+      }
+    }
+    
+    if (keyCode == DOWN) {
+      if (s == GRAVITY) {
+        G_CONSTANT *= 10;
+        G_CONSTANT -= 1;
+        G_CONSTANT /= 10;
+      }
+      else if (s == DRAGF) {
+        D_COEF *= 10;
+        D_COEF -= 1;
+        D_COEF /= 10;
+      }
+      else if (s == SPRING) {
+        SPRING_K *= 1000;
+        SPRING_K -= 5;
+        SPRING_K /= 1000;
+        //SPRING_K -= 0.005;
+      }
+    }
+  }
+  
+  
 }//keyPressed
 
 
@@ -399,28 +497,52 @@ void displayMode(int mode)
   
   //gravity mode
   if (mode == GRAVITY) {
+    text("G: "+G_CONSTANT,0,30);
   }
   
   // drag mode
   
   if (mode == DRAGF) {
+    text("Drag: "+D_COEF,0,30);
   }
   
   // spring mode
   
   if (mode == SPRING) {
-    
+    text("Spring K: "+SPRING_K,0,30);
   }
   
   //electrostatic mode
   
   if (mode == ELECTROSTATIC) {
     
+    text("Coulomb K: "+E_CONSTANT,0,30);
   }
   
   // combination mode
   
   if (mode == COMBINATION) {
+    fill(255,0,0);
+    if (s == GRAVITY) {
+      rect(0,30,20,20);
+    }
+    else if (s == DRAGF) {
+      rect(0,50,45,20);
+    }
+    else if (s == SPRING) {
+      rect(0,70,75,20);
+    }
+    else if (s == ELECTROSTATIC) {
+      rect(0,90,100,20);
+    }
+    
+    fill(0);
+    text("G: "+G_CONSTANT,0,30);
+    text("Drag: "+D_COEF,0,50);
+    text("Spring K: "+SPRING_K,0,70);
+    text("Coulomb K: "+E_CONSTANT,0,90);
+    
+   
   }
   
   // combination mode
