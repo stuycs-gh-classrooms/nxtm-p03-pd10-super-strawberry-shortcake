@@ -41,8 +41,13 @@ float SPRING_K = 0.005;
 
 int MOVING = 0;
 int BOUNCE = 1;
-int GRAVITY = 2;
-int DRAGF = 3;
+
+
+int GRAVITY = 0;
+int SPRING = 1;
+int DRAGF = 2;
+int EF = 3;
+int COMB = 4;
 
 
 String[] modes = {"Gravity", "Spring", "Drag", "Electrostatic", "Combination"}; //these are the modes we can switch between for different simulations
@@ -65,7 +70,9 @@ void setup()
 
   //Part 0: Write makeOrbs below
   earth = new FixedOrb(width / 2, height / 2, 80, 50);
-
+  
+  orbCount = NUM_ORBS;
+  
   makeOrbs(); // must be recalled when a new simulation is triggered
 }//setup
 
@@ -107,8 +114,22 @@ void draw()
     }
   }*/
   
-  if () {
+  if (toggles[GRAVITY]) {
+    earth.display();
+    gravitySim();
   }
+  
+  else if (toggles[SPRING]) {
+    springSim();
+  }
+  
+  else if (toggles[DRAGF]) {
+    dragSim();
+  }
+  
+  
+  
+  
   
   
 }
@@ -116,29 +137,36 @@ void draw()
 
 void gravitySim() {
   
-  earth.display();
+  
 
   for (int o = 0; o < orbs.length; o++) {
-    orbs[o].display();
-    PVector gForce = orbs[o].getGravity(earth, G_CONSTANT);
-    orbs[o].applyForce(gForce);
-    orbs[o].move(defaultToggles[BOUNCE]);
+    if (orbs[o] != null) {
+      orbs[o].display();
+      PVector gForce = orbs[o].getGravity(earth, G_CONSTANT);
+      orbs[o].applyForce(gForce);
+      orbs[o].move(defaultToggles[BOUNCE]);
+    }
   }
 }
 
 void springSim() {
-
+  
+  
   for (int o = 0; o < orbs.length; o++) {
-    orbs[o].display();
+    if (orbs[o] != null) {
+      orbs[o].display();
 
-    if (o < orbs.length - 1) {
-      drawSpring(orbs[o], orbs[o+1]);
+      if (o < orbs.length - 1) {
+        drawSpring(orbs[o], orbs[o+1]);
+      }
     }
   }
   applySprings();
 
   for (int i = 0; i < orbs.length; i++) {
-    orbs[i].move(defaultToggles[BOUNCE]);
+    if (orbs[i] != null) {
+      orbs[i].move(defaultToggles[BOUNCE]);
+    }
   }
 }
 
@@ -146,25 +174,31 @@ void springSim() {
 void dragSim() {
 
   for (int o = 0; o < orbs.length; o++) {
-    orbs[o].display();
+    if (orbs[o] != null) {
+      orbs[o].display();
 
-    PVector dragForce = orbs[o].getDragForce(D_COEF);
-    orbs[o].applyForce(dragForce);
+      PVector dragForce = orbs[o].getDragForce(D_COEF);
+      orbs[o].applyForce(dragForce);
 
-    orbs[o].move(defaultToggles[BOUNCE]);
+      orbs[o].move(defaultToggles[BOUNCE]);
+    }
   }
 }
 
 void EFSim() {
 
   for (int o = 0; o < orbs.length; o++) {
-    orbs[o].display();
+    if (orbs[o] != null) {
+      orbs[o].display();
+    }
   }
 
   applyElectro();
 
   for (int i = 0; i < orbs.length; i++) {
-    orbs[i].move(defaultToggles[BOUNCE]);
+    if (orbs[i] != null) {
+      orbs[i].move(defaultToggles[BOUNCE]);
+    }
   }
 }
 
@@ -205,15 +239,17 @@ void applySprings()
   PVector bSpring;
   PVector fSpring;
   for (int i = 1; i < orbCount; i++) {
-    if (i == orbCount - 1) {
-      bSpring = orbs[i].getSpring(orbs[i - 1], SPRING_LENGTH, SPRING_K);
-      f = bSpring;
-    } else {
-      bSpring = orbs[i].getSpring(orbs[i - 1], SPRING_LENGTH, SPRING_K);
-      fSpring = orbs[i].getSpring(orbs[i + 1], SPRING_LENGTH, SPRING_K);
-      f = PVector.add(bSpring, fSpring);
+    if (orbs[i] != null) {
+      if (i == orbCount - 1) {
+        bSpring = orbs[i].getSpring(orbs[i - 1], SPRING_LENGTH, SPRING_K);
+        f = bSpring;
+      } else {
+        bSpring = orbs[i].getSpring(orbs[i - 1], SPRING_LENGTH, SPRING_K);
+        fSpring = orbs[i].getSpring(orbs[i + 1], SPRING_LENGTH, SPRING_K);
+        f = PVector.add(bSpring, fSpring);
+      }
+      orbs[i].applyForce(f);
     }
-    orbs[i].applyForce(f);
   }
 }//applySprings
 
@@ -271,24 +307,75 @@ int findAvailableIndex() { // finds the first available index for an orb
  */
 void keyPressed()
 {
+  int previous = GRAVITY;
+  
   if (key == ' ') {
-    toggles[MOVING]  = !toggles[MOVING];
-  }
-  if (key == 'g') {
-    toggles[GRAVITY] = !toggles[GRAVITY];
+    defaultToggles[MOVING]  = !defaultToggles[MOVING];
   }
   if (key == 'b') {
-    toggles[BOUNCE]  = !toggles[BOUNCE];
+    defaultToggles[BOUNCE]  = !defaultToggles[BOUNCE];
   }
-  if (key == 'd') {
-    toggles[DRAGF]   = !toggles[DRAGF];
-  }
+  
+  
   if (key == '1') {
-    makeOrbs();
+    toggles[GRAVITY] = !toggles[GRAVITY];
+    
+    for (int i = 0; i < GRAVITY; i++) {
+      toggles[i] = false;
+    }
+    for (int j = GRAVITY+1; j < toggles.length; j++) {
+      toggles[j] = false;
+    }
   }
+  
   if (key == '2') {
+    toggles[SPRING] = !toggles[SPRING];
+    
+    for (int i = 0; i < SPRING; i++) {
+      toggles[i] = false;
+    }
+    for (int j = SPRING+1; j < toggles.length; j++) {
+      toggles[j] = false;
+    }
+  }
+  
+  if (key == '3') {
+    toggles[DRAGF] = !toggles[DRAGF];
+    
+    for (int i = 0; i < DRAGF; i++) {
+      toggles[i] = false;
+    }
+    for (int j = DRAGF+1; j < toggles.length; j++) {
+      toggles[j] = false;
+    }
+  }
+  
+  if (key == '4') {
+    toggles[EF] = !toggles[EF];
+    
+    for (int i = 0; i < EF; i++) {
+      toggles[i] = false;
+    }
+    for (int j = EF+1; j < toggles.length; j++) {
+      toggles[j] = false;
+    }
+  }
+  
+  if (key == '5') {
+    toggles[COMB] = !toggles[COMB];
+    
+    for (int i = 0; i < COMB; i++) {
+      toggles[i] = false;
+    }
+    for (int j = COMB+1; j < toggles.length; j++) {
+      toggles[j] = false;
+    }
+  }
+  
+  if (key == 'p') {
     makeOrbs();
   }
+  
 
   if (key == '-') {
     if (orbCount > 2) {
