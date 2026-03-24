@@ -207,6 +207,10 @@ class Orb
     fill(c);
     circle(center.x, center.y, bsize);
     fill(0);
+    
+    if (charge != 0) {
+      text(charge, center.x, center.y);
+    }
     //text(mass, center.x, center.y);
   }//display
 }//Ball

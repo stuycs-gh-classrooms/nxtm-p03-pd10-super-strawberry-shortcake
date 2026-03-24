@@ -2,7 +2,7 @@
  SpringArrayDriver (Most Work Goes Here)
  
  TASK:
- You will write a program that creates an array of orbs. 
+ You will write a program that creates an array of orbs.
  When run, the simulation should show the orbs,
  connected by springs,
  moving according to the push/pull of the spring forces.
@@ -43,8 +43,16 @@ int MOVING = 0;
 int BOUNCE = 1;
 int GRAVITY = 2;
 int DRAGF = 3;
-boolean[] toggles = new boolean[4];
-String[] modes = {"Moving", "Bounce", "Gravity", "Drag"};
+
+
+String[] modes = {"Gravity", "Spring", "Drag", "Electrostatic", "Combination"}; //these are the modes we can switch between for different simulations
+boolean[] toggles = new boolean[5];
+
+String[] defaultModes = {"Moving", "Bounce"}; //modes for all force simulation except combination
+boolean[] defaultToggles = new boolean[2];
+
+
+
 
 FixedOrb earth;
 Orb[] orbs;
@@ -56,9 +64,9 @@ void setup()
   size(600, 600);
 
   //Part 0: Write makeOrbs below
-  earth = new FixedOrb(width / 2, height / 2, 80 , 50);
-  makeOrbs(true);
-  
+  earth = new FixedOrb(width / 2, height / 2, 80, 50);
+
+  makeOrbs(); // must be recalled when a new simulation is triggered
 }//setup
 
 
@@ -66,120 +74,131 @@ void draw()
 {
   background(255);
   displayMode();
+  
+  
+  /*
+  earth.display();
 
-  //draw the orbs and springs
+  
   for (int o=0; o < orbCount; o++) {
     orbs[o].display();
-    //Part 1: write drawSpring below
-    //Use drawspring correctly to draw springs'
-    
+
+
     if (o < orbCount - 1) {
-      drawSpring(orbs[o],orbs[o+1]);
+      drawSpring(orbs[o], orbs[o+1]);
     }
-  
-  }//draw orbs & springs
+  }
 
   if (toggles[MOVING]) {
-    //Part 2: write applySprings below
     applySprings();
 
-    //part 3: apply other forces if toggled on
     for (int o=0; o < orbCount; o++) {
       if (toggles[GRAVITY]) {
-        for (int other = 0; other < orbCount; other++) {
-          if (o != other) {
-            PVector gForce = orbs[o].getGravity(orbs[other], G_CONSTANT);
-            orbs[o].applyForce(gForce);
-          }
-        }
+        PVector gForce = orbs[o].getGravity(earth, G_CONSTANT);
+        orbs[o].applyForce(gForce);
       }
       if (toggles[DRAGF]) {
         orbs[o].applyForce(orbs[o].getDragForce(D_COEF));
       }
-    }//gravity, drag
+    }
 
     for (int o=0; o < orbCount; o++) {
       orbs[o].move(toggles[BOUNCE]);
     }
-  }//moving
-}//draw
+  }*/
+  
+  if () {
+  }
+  
+  
+}
 
 
-/**
- makeOrbs(boolean ordered)
- 
- Set orbCount to NUM_ORBS
- Initialize and create orbCount Orbs in orbs.
- All orbs should have random mass and size.
- The first orb should be a FixedOrb
- If ordered is true:
- The orbs should be spaced SPRING_LENGTH distance
- apart along the middle of the screen.
- If ordered is false:
- The orbs should be positioned radomly.
- 
- Each orb will be "connected" to its neighbors in the array.
- */
-void makeOrbs(boolean ordered)
-{
+void gravitySim() {
+  
+  earth.display();
+
+  for (int o = 0; o < orbs.length; o++) {
+    orbs[o].display();
+    PVector gForce = orbs[o].getGravity(earth, G_CONSTANT);
+    orbs[o].applyForce(gForce);
+    orbs[o].move(defaultToggles[BOUNCE]);
+  }
+}
+
+void springSim() {
+
+  for (int o = 0; o < orbs.length; o++) {
+    orbs[o].display();
+
+    if (o < orbs.length - 1) {
+      drawSpring(orbs[o], orbs[o+1]);
+    }
+  }
+  applySprings();
+
+  for (int i = 0; i < orbs.length; i++) {
+    orbs[i].move(defaultToggles[BOUNCE]);
+  }
+}
+
+
+void dragSim() {
+
+  for (int o = 0; o < orbs.length; o++) {
+    orbs[o].display();
+
+    PVector dragForce = orbs[o].getDragForce(D_COEF);
+    orbs[o].applyForce(dragForce);
+
+    orbs[o].move(defaultToggles[BOUNCE]);
+  }
+}
+
+void EFSim() {
+
+  for (int o = 0; o < orbs.length; o++) {
+    orbs[o].display();
+  }
+
+  applyElectro();
+
+  for (int i = 0; i < orbs.length; i++) {
+    orbs[i].move(defaultToggles[BOUNCE]);
+  }
+}
+
+void makeOrbs() {
   orbCount = NUM_ORBS;
   orbs = new Orb[orbCount];
 
-  orbs[0] = earth;
 
-  for (int i = 1; i < orbCount; i++) {
+  for (int i = 0; i < orbCount; i++) {
     orbs[i] = new Orb();
-    if (ordered) {
-      orbs[i].center.x = (SPRING_LENGTH / 2) + (i * SPRING_LENGTH);
-      orbs[i].center.y = height / 2;
-    }
-    else {
-      orbs[i].center.x = random(0 + orbs[i].bsize, width - orbs[i].bsize);
-      orbs[i].center.y = random(0 + orbs[i].bsize, height - orbs[i].bsize);
-    }
+    orbs[i].center.x = random(0 + orbs[i].bsize, width - orbs[i].bsize);
+    orbs[i].center.y = random(0 + orbs[i].bsize, height - orbs[i].bsize);
   }
-    
 }//makeOrbs
 
 
-/**
- drawSpring(Orb o0, Orb o1)
- 
- Draw a line between the two Orbs.
- Line color should change as follows:
- red: The spring is stretched.
- green: The spring is compressed.
- black: The spring is at its normal length
- */
 void drawSpring(Orb o0, Orb o1)
 {
-  float d = dist(o0.center.x,o0.center.y,o1.center.x,o1.center.y);
+  float d = dist(o0.center.x, o0.center.y, o1.center.x, o1.center.y);
   if (SPRING_LENGTH < d) {
-    stroke(255,0,0);
+    stroke(255, 0, 0);
   }
   if (SPRING_LENGTH > d) {
-    stroke(0,255,0);
+    stroke(0, 255, 0);
   }
   if (SPRING_LENGTH == d) {
     stroke(0);
   }
 
-  line(o0.center.x,o0.center.y,o1.center.x,o1.center.y);
+  line(o0.center.x, o0.center.y, o1.center.x, o1.center.y);
   stroke(0);
 }//drawSpring
 
 
-/**
- applySprings()
- 
- FIRST: Fill in getSpring in the Orb class.
- 
- THEN:
- Go through the Orbs array and apply the spring
- force correctly for each orb. We will consider every
- orb as being "connected" via a spring to is
- neighboring orbs in the array.
- */
 void applySprings()
 {
   PVector f;
@@ -189,39 +208,34 @@ void applySprings()
     if (i == orbCount - 1) {
       bSpring = orbs[i].getSpring(orbs[i - 1], SPRING_LENGTH, SPRING_K);
       f = bSpring;
-    }
-    else {
+    } else {
       bSpring = orbs[i].getSpring(orbs[i - 1], SPRING_LENGTH, SPRING_K);
       fSpring = orbs[i].getSpring(orbs[i + 1], SPRING_LENGTH, SPRING_K);
-      f = PVector.add(bSpring,fSpring);
+      f = PVector.add(bSpring, fSpring);
     }
     orbs[i].applyForce(f);
   }
 }//applySprings
 
 void applyElectro() {
-  for (int i = 1; i < orbCount; i++) {
-    
-} //applyElectro
+  PVector f;
+  PVector bEF;
+  PVector fEF;
 
-void applyCharge() {
   for (int i = 1; i < orbCount; i++) {
-    
+
+    if (i == orbCount - 1) {
+      bEF = orbs[i].getEF(orbs[i-1], E_CONSTANT);
+      f = bEF;
+    } else {
+      bEF = orbs[i].getEF(orbs[i-1], E_CONSTANT);
+      fEF = orbs[i].getEF(orbs[i+1], E_CONSTANT);
+      f = PVector.add(bEF, fEF);
+    }
+    orbs[i].applyForce(f);
+  } //applyElectro
 }
 
-void 
-
-
-/**
- addOrb()
- 
- Add an orb to the arry of orbs.
- 
- If the array of orbs is full, make a
- new, larger array that contains all
- the current orbs and the new one.
- (check out arrayCopy() to help)
- */
 void addOrb()
 {
   int index = findAvailableIndex();
@@ -233,18 +247,11 @@ void addOrb()
     tempArray[orbCount].center.y = orbs[orbCount - 1].center.y;
     orbCount++;
     orbs = tempArray;
-  }
-  else {
+  } else {
     orbs[index] = new Orb();
   }
 }//addOrb
 
-/**
- findAvailableIndex()
- 
- Checks for an empty index in the orbs array. Returns the value of the closest empty index to 0 if successful,
- otherwise, returns a -1 if there are no available indexes.
- */
 
 int findAvailableIndex() { // finds the first available index for an orb
   for (int i = 0; i < orbs.length; i++) { // checks every index in orbs.
@@ -277,10 +284,10 @@ void keyPressed()
     toggles[DRAGF]   = !toggles[DRAGF];
   }
   if (key == '1') {
-    makeOrbs(true);
+    makeOrbs();
   }
   if (key == '2') {
-    makeOrbs(false);
+    makeOrbs();
   }
 
   if (key == '-') {
