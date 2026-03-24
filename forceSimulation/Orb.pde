@@ -40,7 +40,6 @@ class Orb
     setColor();
   }
 
-
   /**
    A function that moves the orb.
    */
@@ -136,17 +135,16 @@ class Orb
    eK: electrostatic constant
    */
   
-  PVector getEF (Orb other, float eK) {
+PVector getEF (Orb other, float eK) {
     PVector direction = PVector.sub(other.center, this.center);
     direction.normalize();
-    
-    float displacement = this.center.dist(other.center);
-    float mag = (eK * (other.charge * this.charge)) / sq(displacement);
+    float displacement = max(this.center.dist(other.center), MIN_SIZE);
+    float mag = (eK * (this.charge * other.charge)) / sq(displacement);
     direction.mult(mag);
     direction.mult(-1);
-    
+
     return direction;
-  }
+}
 
   /**
    Makes the orb bounce off of the top and bottom sides of the box.
@@ -218,6 +216,15 @@ class Orb
     fill(c);
     circle(center.x, center.y, bsize);
     fill(0);
+    
+    if (mode == ELECTROSTATIC || mode == COMBINATION) {
+      textSize(20);
+      noStroke();
+      text(int(charge),center.x,center.y);
+      
+    }
+    
+
     //text(mass, center.x, center.y);
   }//display
 }//Ball

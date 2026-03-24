@@ -34,7 +34,7 @@ float MIN_MASS = 10;
 float MAX_MASS = 100;
 float G_CONSTANT = 0.1;
 float D_COEF = 0.1;
-float E_CONSTANT = 0.1;
+float E_CONSTANT = 500;
 
 int SPRING_LENGTH = 50;
 float SPRING_K = 0.005;
@@ -43,10 +43,12 @@ int MOVING = 0;
 int BOUNCE = 1;
 int GRAVITY = 2;
 int DRAGF = 3;
-int ELECTROSTATIC = 4;
-int COMBINATION = 5;
-boolean[] toggles = new boolean[6];
-String[] modes = {"Moving", "Bounce", "Gravity", "Drag","Electrostatic","Combination"};
+int SPRING = 4;
+int ELECTROSTATIC = 5;
+int COMBINATION = 6;
+boolean[] toggles = new boolean[7];
+String[] modes = {"Moving", "Bounce", "Gravity", "Drag","Spring","Electrostatic","Combination"};
+int mode;
 
 FixedOrb earth;
 Orb[] orbs;
@@ -67,24 +69,20 @@ void setup()
 void draw()
 {
   background(255);
-  displayMode();
+    mode = -1;
+  for (int i = 2; i < toggles.length; i++) {
+    if (toggles[i]) {
+      mode = i;
+    }
+  }
+  displayMode(mode);
 
   //draw the orbs and springs
   for (int o=0; o < orbCount; o++) {
     orbs[o].display();
-    //Part 1: write drawSpring below
-    //Use drawspring correctly to draw springs'
-    
-    if (o < orbCount - 1) {
-      drawSpring(orbs[o],orbs[o+1]);
-    }
-  
-  }//draw orbs & springs
+  }
 
   if (toggles[MOVING]) {
-    //Part 2: write applySprings below
-    applySprings();
-
     //part 3: apply other forces if toggled on
     for (int o=0; o < orbCount; o++) {
       if (toggles[GRAVITY]) {
@@ -102,25 +100,37 @@ void draw()
       
       if (toggles[ELECTROSTATIC]) {
         for (int other = 0; other < orbCount; other++) {
-          if (o != other) {
+          if (o != other && orbs[o] != null && orbs[other] != null) {
            
-        PVector eForce = orbs[o].getGravity(orbs[other], E_CONSTANT);
+        PVector eForce = orbs[o].getEF(orbs[other], E_CONSTANT);
         orbs[o].applyForce(eForce);
       }
         }
       }
       
+      if (toggles[SPRING]) {
+        applySprings();
+        if (o < orbCount - 1) {
+          drawSpring(orbs[o],orbs[o+1]);
+        }
+      }      
+      
       if (toggles[COMBINATION]) {
-        for (int o = 0; o < orbCount; o++) {
         for (int other = 0; other < orbCount; other++) {
           if (o != other) {
             PVector gForce = orbs[o].getGravity(orbs[other], G_CONSTANT);
-                    orbs[o].applyForce(orbs[o].getDragForce(D_COEF));
-   
+            orbs[o].applyForce(gForce);            
+            orbs[o].applyForce(orbs[o].getDragForce(D_COEF));
+        PVector eForce = orbs[o].getEF(orbs[other], E_CONSTANT);            
+        orbs[o].applyForce(eForce);   
+        applySprings();
+        if (o < orbCount - 1) {
+          drawSpring(orbs[o],orbs[o+1]);
+        }
           }
         }
         }
-      }
+      
     }//gravity, drag, electrostatic
 
     for (int o=0; o < orbCount; o++) {
@@ -149,9 +159,11 @@ void makeOrbs(boolean ordered)
 {
   orbCount = NUM_ORBS;
   orbs = new Orb[orbCount];
-
-  orbs[0] = earth;
-
+  if (mode != ELECTROSTATIC) {
+    orbs[0] = earth;
+  } else {
+    orbs[0] = new Orb();
+  }
   for (int i = 1; i < orbCount; i++) {
     orbs[i] = new Orb();
     if (ordered) {
@@ -163,10 +175,7 @@ void makeOrbs(boolean ordered)
       orbs[i].center.y = random(0 + orbs[i].bsize, height - orbs[i].bsize);
     }
   }
-    
-}//makeOrbs
-
-
+}
 /**
  drawSpring(Orb o0, Orb o1)
  
@@ -224,17 +233,16 @@ void applySprings()
   }
 }//applySprings
 
-
-void applyElectro() {
-
-} //applyElectro
-
+/**
+ applyCharge()
+ 
+ applies a random charge to each of the orbs
+ */
+ 
 void applyCharge() {
-  for (int i = 1; i < orbCount; i++) {
-    
-    
+  for (int i = 0; i < orbCount; i++) {
+    orbs[i].charge = int(random(-3,3));   
   }
-    
 }
 
 
@@ -296,12 +304,17 @@ void keyPressed()
   }
   if (key == 'g') {
     toggles[GRAVITY] = !toggles[GRAVITY];
+    println(toggles[GRAVITY]);
     toggles[DRAGF] = false;
     toggles[ELECTROSTATIC] = false;
     toggles[COMBINATION] = false;
+    toggles[SPRING] = false;    
+    mode = GRAVITY;
+    makeOrbs(false);
   }
   if (key == 'b') {
     toggles[BOUNCE]  = !toggles[BOUNCE];
+    
     
   }
   if (key == 'd') {
@@ -309,19 +322,38 @@ void keyPressed()
     toggles[GRAVITY] = false;
     toggles[ELECTROSTATIC] = false;
     toggles[COMBINATION] = false;
+    toggles[SPRING] = false;
+    mode = DRAGF;
     
+  }
+  if (key == 's') {
+    toggles[SPRING] = !toggles [SPRING];
+    toggles[GRAVITY] = false;
+    toggles[ELECTROSTATIC] = false;
+    toggles[COMBINATION] = false;
+    toggles[DRAGF] = false;
+    mode = SPRING;
+    makeOrbs(false);
   }
   if (key == 'e') {
     toggles[ELECTROSTATIC]   = !toggles[ELECTROSTATIC];
     toggles[GRAVITY] = false;
     toggles[DRAGF] = false;
     toggles[COMBINATION] = false;
+    toggles[SPRING] = false;
+    mode = ELECTROSTATIC;
+    makeOrbs(false);
+    applyCharge();
   }
   if (key == 'c') {
     toggles[COMBINATION]   = !toggles[COMBINATION];
     toggles[GRAVITY] = false;
     toggles[DRAGF] = false;
     toggles[ELECTROSTATIC] = false;
+    toggles[SPRING] = false;
+    mode = COMBINATION;
+    makeOrbs(false);
+    applyCharge();
   }
   if (key == '1') {
     makeOrbs(true);
@@ -342,7 +374,7 @@ void keyPressed()
 }//keyPressed
 
 
-void displayMode()
+void displayMode(int mode)
 {
   textAlign(LEFT, TOP);
   textSize(20);
@@ -364,4 +396,32 @@ void displayMode()
     text(modes[m], x+2, 2);
     x+= w+5;
   }
+  
+  //gravity mode
+  if (mode == GRAVITY) {
+  }
+  
+  // drag mode
+  
+  if (mode == DRAGF) {
+  }
+  
+  // spring mode
+  
+  if (mode == SPRING) {
+    
+  }
+  
+  //electrostatic mode
+  
+  if (mode == ELECTROSTATIC) {
+    
+  }
+  
+  // combination mode
+  
+  if (mode == COMBINATION) {
+  }
+  
+  // combination mode
 }//display
