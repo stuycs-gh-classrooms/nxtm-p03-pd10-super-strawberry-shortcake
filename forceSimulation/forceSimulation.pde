@@ -180,6 +180,10 @@ void makeOrbs(boolean ordered)
     if (toggles[ELECTROSTATIC] || toggles[COMBINATION]) {
       orbs[i].charge = int(random(-5,6));
     }
+    
+    if (toggles[DRAGF]) {
+      orbs[i].velocity = new PVector(random(-10,11),random(-10,11));
+    }
   }
 }
 /**
