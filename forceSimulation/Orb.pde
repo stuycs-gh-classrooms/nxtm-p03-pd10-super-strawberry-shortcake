@@ -220,6 +220,8 @@ PVector getEF (Orb other, float eK) {
     if (mode == ELECTROSTATIC || mode == COMBINATION) {
       textSize(20);
       noStroke();
+      textAlign(CENTER,CENTER);
+      fill(255);
       text(int(charge),center.x,center.y);
       
     }
