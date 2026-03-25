@@ -176,6 +176,10 @@ void makeOrbs(boolean ordered)
       orbs[i].center.x = random(0 + orbs[i].bsize, width - orbs[i].bsize);
       orbs[i].center.y = random(0 + orbs[i].bsize, height - orbs[i].bsize);
     }
+    
+    if (toggles[ELECTROSTATIC] || toggles[COMBINATION]) {
+      orbs[i].charge = int(random(-5,6));
+    }
   }
 }
 /**
